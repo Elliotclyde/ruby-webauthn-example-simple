@@ -1,0 +1,23 @@
+<% current_user.credentials.each do |credential| %>
+  <li>
+    <span>
+      <%= credential.nickname %>
+    </span>
+
+    <span>
+      <%= credential.external_id %>
+    </span>
+
+    <% if current_user.can_delete_credentials? %>
+      <%= link_to "delete", credential, method: :delete %>
+    <% end %>
+  </li>
+<% end %>
+</ul>
+
+<div data-controller="add-credential">
+  <%= form_with scope: :credential, url: credentials_path, local: false, data: { action: "ajax:success->add-credential#create" } do |form| %>
+    <%= form.text_field :nickname, placeholder: "New Security Key nickname", required: true %>
+    <%= form.submit "Add Security Key" %>
+  <% end %>
+</div>
