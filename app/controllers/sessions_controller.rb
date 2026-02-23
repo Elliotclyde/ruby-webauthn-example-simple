@@ -5,7 +5,7 @@ class SessionsController < ApplicationController
   end
 
   def create
-    user = User.find_by(username: session_params[:username])
+    user = User.find_by(username: params[:username])
 
     if user
       get_options = WebAuthn::Credential.options_for_get(
@@ -13,20 +13,20 @@ class SessionsController < ApplicationController
         user_verification: "required"
       )
 
-      session[:current_authentication] = { challenge: get_options.challenge, username: session_params[:username] }
+      session[:current_authentication] = { challenge: get_options.challenge, username: params[:username] }
 
       respond_to do |format|
         format.json { render json: get_options }
       end
     else
       respond_to do |format|
-        format.json { render json: { errors: ["Username doesn't exist"] }, status: :unprocessable_content }
+        format.json { render json: { errors: [ "Username doesn't exist" ] }, status: :unprocessable_content }
       end
     end
   end
 
   def callback
-    webauthn_credential = WebAuthn::Credential.from_get(params)
+    webauthn_credential = WebAuthn::Credential.from_get(JSON.parse(params[:credential]))
 
     user = User.find_by(username: session[:current_authentication]["username"])
     raise "user #{session[:current_authentication]["username"]} never initiated sign up" unless user
@@ -44,9 +44,9 @@ class SessionsController < ApplicationController
       credential.update!(sign_count: webauthn_credential.sign_count)
       sign_in(user)
 
-      render json: { status: "ok" }, status: :ok
+      redirect_to root_path, notice: "Successfully signed in!"
     rescue WebAuthn::Error => e
-      render json: "Verification failed: #{e.message}", status: :unprocessable_content
+      redirect_to new_session_path, alert: "Verification failed: #{e.message}"
     ensure
       session.delete(:current_authentication)
     end
@@ -54,13 +54,6 @@ class SessionsController < ApplicationController
 
   def destroy
     sign_out
-
     redirect_to root_path
-  end
-
-  private
-
-  def session_params
-    params.require(:session).permit(:username)
   end
 end

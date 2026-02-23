@@ -1,5 +1,9 @@
-<%= form_with scope: :session, url: session_path, local: false, id: "new-session", data: { controller: "new-session", action: "ajax:success->new-session#create ajax:error->new-session#error" } do |form| %>
-  <%= form.text_field :username, placeholder: "Username", required: true, autocapitalize: "none", "aria-controls" => "username-helper-text" %>
-  <%= form.submit "Sign in using WebAuthn" %>
+<%= form_with url: callback_session_path, method: :post, id: "login-form" do |f| %>
+  <div>
+    <%= f.label :username %>
+    <%= f.text_field :username %>
+  </div>
+
+  <%= f.submit "Login" %>
 <% end %>
 <%= link_to 'Register', new_registration_path %>
