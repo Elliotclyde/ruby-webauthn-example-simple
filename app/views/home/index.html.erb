@@ -1,0 +1,14 @@
+<h1>Hello <%= current_user.username %></h1>
+
+<% current_user.credentials.each do |credential| %>
+  <li>
+    <span>
+      <%= credential.nickname %>
+    </span>
+
+    <span>
+      <%= credential.external_id %>
+    </span>
+  </li>
+<% end %>
+</ul>
