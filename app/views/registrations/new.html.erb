@@ -1,0 +1,13 @@
+<%= form_with url: callback_registration_path, method: :post, id: "registration-form" do |f| %>
+  <div>
+    <%= f.label :username %>
+    <%= f.text_field :username %>
+  </div>
+
+  <div>
+    <%= f.label :nickname, "Security Key Nickname" %>
+    <%= f.text_field :credential_nickname %>
+  </div>
+
+  <%= f.submit "Register" %>
+<% end %>
